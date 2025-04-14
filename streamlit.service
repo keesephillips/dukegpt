@@ -1,0 +1,18 @@
+[Unit]
+Description=Streamlit service
+After=network.target
+
+[Service]
+# Command to start your Streamlit app:
+ExecStart=/usr/bin/python3 -m streamlit run /home/keese/app.py --server.port=8501
+
+# Ensure the service restarts on failure:
+Restart=always
+RestartSec=5
+
+# The user that runs the service (non-root is recommended):
+User=keese
+WorkingDirectory=/home/keese
+
+[Install]
+WantedBy=multi-user.target
