@@ -17,13 +17,10 @@ from langchain.memory import ConversationBufferMemory
 from langchain_core.prompts import ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
 from huggingface_hub import login
 from dotenv import load_dotenv, dotenv_values 
-
-load_dotenv() 
-
 import warnings
 warnings.filterwarnings("ignore")
 
-
+load_dotenv() 
 login(token=os.getenv('API_KEY'))
 
 
@@ -428,13 +425,11 @@ class Model():
         self.create_vectors()
         
     def create_vectors(self):
-        # 1) Check for existing indexes on disk
         duke_index_path = "duke_faiss_index"
         pratt_index_path = "pratt_faiss_index"
         aipi_index_path = "aipi_faiss_index"
         cat_index_path = "cat_faiss_index"
 
-        # 2) If existing indexes are found, load them
         if os.path.exists(duke_index_path):
             self.duke_vector_store = FAISS.load_local(duke_index_path, self.embedding_model,allow_dangerous_deserialization=True)
         else:
@@ -473,30 +468,6 @@ class Model():
                 documents.append(Document(page_content=cat))
             self.cat_vector_store = FAISS.from_documents(documents, self.embedding_model)
             self.cat_vector_store.save_local(cat_index_path)
-
-            
-    # def create_vectors(self):
-    #     for file in ["duke.parquet", "pratt.parquet", "aipi.parquet"]:
-    #         df = pd.read_parquet(f'data/{file}')
-    #         documents = []
-    #         for content in zip(set(df['content'])):
-    #             documents.append(Document(page_content=content[0], metadata={'source': ''}))
-    #         if file == "duke.parquet":
-    #             self.duke_vector_store = FAISS.from_documents(documents, self.embedding_model)
-    #             self.duke_vector_store.save_local("duke_faiss_index")
-    #         elif file == "pratt.parquet":
-    #             self.pratt_vector_store = FAISS.from_documents(documents, self.embedding_model)
-    #             self.pratt_vector_store.save_local("pratt_faiss_index")
-    #         elif file == "aipi.parquet":
-    #             self.aipi_vector_store = FAISS.from_documents(documents, self.embedding_model)
-    #             self.aipi_vector_store.save_local("aipi_faiss_index")
-
-    #     documents = []
-    #     for cat in self.CATEGORIES:
-    #         documents.append(Document(page_content=cat))
-
-    #     self.cat_vector_store = FAISS.from_documents(documents, self.embedding_model)
-    #     self.cat_vector_store.save_local("cat_faiss_index")
 
     def parse_categories(self, query:str) -> list:
         docs = self.cat_vector_store.similarity_search(query, k=3)  
